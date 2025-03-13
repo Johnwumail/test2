@@ -1,0 +1,116 @@
+# Demo: Nginx Web Server Setup
+# This configuration sets up a basic Nginx web server with optimized settings
+
+# Target server information
+hostname: "web01.example.com"  # Replace with your actual server hostname
+username: "admin"              # SSH username for connection
+port: 22                       # SSH port (default: 22)
+
+# Server configuration
+server_type: "web_server"
+web_server: "nginx"
+document_root: "/var/www/html"
+
+# Nginx configuration
+nginx_config:
+  # Worker processes (auto = number of CPU cores)
+  worker_processes: "auto"
+  worker_connections: 1024
+  
+  # Performance settings
+  keepalive_timeout: 65
+  client_max_body_size: "10M"
+  
+  # Gzip compression
+  gzip_enabled: true
+  gzip_comp_level: 6
+  gzip_types:
+    - "text/plain"
+    - "text/css"
+    - "application/json"
+    - "application/javascript"
+    - "text/xml"
+    - "application/xml"
+    - "text/javascript"
+
+# Server hardening
+security:
+  # Firewall rules
+  firewall_enabled: true
+  allowed_ports:
+    - 22    # SSH
+    - 80    # HTTP
+    - 443   # HTTPS
+  
+  # SSL/TLS settings
+  ssl_enabled: true
+  ssl_protocols:
+    - "TLSv1.2"
+    - "TLSv1.3"
+  ssl_ciphers: "ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384"
+  
+  # Security headers
+  security_headers:
+    X-Content-Type-Options: "nosniff"
+    X-Frame-Options: "SAMEORIGIN"
+    X-XSS-Protection: "1; mode=block"
+    Content-Security-Policy: "default-src 'self';"
+    Referrer-Policy: "strict-origin-when-cross-origin"
+
+# Sample content
+setup_demo_site: true
+site_title: "Welcome to Nginx"
+site_content: |
+  <!DOCTYPE html>
+  <html>
+  <head>
+    <title>Welcome to Nginx on {{hostname}}</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        line-height: 1.6;
+        margin: 40px;
+        color: #333;
+      }
+      h1 {
+        color: #0066cc;
+      }
+      .container {
+        max-width: 800px;
+        margin: 0 auto;
+        border: 1px solid #ddd;
+        padding: 20px;
+        border-radius: 5px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      }
+      footer {
+        margin-top: 20px;
+        font-size: 0.8em;
+        color: #777;
+        text-align: center;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>{{site_title}}</h1>
+      <p>If you see this page, the web server has been successfully set up by IT Admin Agent.</p>
+      <p>The server is running Nginx with optimized security and performance settings.</p>
+    </div>
+    <footer>
+      <p>Configured by IT Admin Agent - {{timestamp}}</p>
+    </footer>
+  </body>
+  </html>
+
+# Validation steps
+validation:
+  # Check that Nginx is running
+  service_check: true
+  
+  # Test HTTP response
+  http_check: true
+  http_status: 200
+  
+  # Check configuration syntax
+  config_syntax_check: true 

@@ -1,0 +1,65 @@
+version: '3.8'
+
+services:
+  # Main IT Admin Agent
+  itadmin:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: itadmin_agent
+    restart: unless-stopped
+    ports:
+      - "8000:8000"  # API
+      - "8501:8501"  # Dashboard
+    volumes:
+      - ./data:/app/data
+      - ./logs:/app/logs
+      - ./config:/app/config
+    environment:
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - ITADMIN_SYSTEM_ENVIRONMENT=production
+      - ITADMIN_SYSTEM_LOG_LEVEL=INFO
+    networks:
+      - itadmin-network
+    depends_on:
+      - vector-db
+    command: python main.py --mode full --config config/config.yaml
+
+  # Vector Database (Chroma)
+  vector-db:
+    image: ghcr.io/chroma-core/chroma:latest
+    container_name: itadmin_vector_db
+    restart: unless-stopped
+    environment:
+      - CHROMA_DB_IMPL=duckdb+parquet
+      - CHROMA_PERSIST_DIRECTORY=/chroma/data
+    volumes:
+      - ./data/chroma:/chroma/data
+    ports:
+      - "8001:8000"  # Expose Chroma API internally
+    networks:
+      - itadmin-network
+
+  # Development-only tools (disabled in production)
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: itadmin_pgadmin
+    restart: unless-stopped
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=${PGADMIN_EMAIL:-admin@example.com}
+      - PGADMIN_DEFAULT_PASSWORD=${PGADMIN_PASSWORD:-admin}
+    ports:
+      - "5050:80"
+    volumes:
+      - pgadmin-data:/var/lib/pgadmin
+    networks:
+      - itadmin-network
+    profiles:
+      - dev
+
+networks:
+  itadmin-network:
+    driver: bridge
+
+volumes:
+  pgadmin-data: 

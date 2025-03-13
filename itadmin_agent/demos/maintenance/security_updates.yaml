@@ -1,0 +1,122 @@
+# Demo: Security Updates
+# This configuration applies security updates to a server with pre and post validation checks
+
+# Target server information
+hostname: "server01.example.com"  # Replace with your actual server hostname
+username: "admin"                 # SSH username for connection
+port: 22                          # SSH port (default: 22)
+
+# Server information
+os_type: "linux"  # Options: linux, windows
+distribution: "ubuntu"  # Options: ubuntu, debian, centos, rhel, etc.
+
+# Pre-update checks
+pre_checks:
+  # System status checks
+  disk_space_check:
+    enabled: true
+    min_free_space_mb: 1000  # Minimum required free space in MB
+  
+  # Create a backup before updates
+  backup:
+    enabled: true
+    backup_type: "snapshot"  # Options: snapshot, file, none
+    backup_location: "/var/backups/security_update_{{timestamp}}"
+  
+  # Test services pre-update to verify current functionality
+  service_check:
+    enabled: true
+    services:
+      - name: "nginx"
+        port: 80
+        check_url: "http://localhost/"
+      - name: "ssh"
+        port: 22
+      - name: "postgresql"
+        port: 5432
+
+# Update configuration
+update:
+  # Update only security packages or all packages
+  security_only: true
+  
+  # Update specific packages or all packages
+  specific_packages: []  # Leave empty for all packages
+  
+  # Package manager options
+  package_manager:
+    apt:
+      options: "--no-install-recommends"
+    yum:
+      options: "--security"
+  
+  # Reboot if necessary
+  reboot:
+    allowed: true
+    timeout: 300  # seconds to wait for reboot
+    check_interval: 10  # seconds between checks
+  
+  # Update process timeout
+  timeout: 1800  # 30 minutes
+
+# Post-update checks
+post_checks:
+  # Verify system status after update
+  system_check:
+    enabled: true
+  
+  # Verify that services are running
+  service_check:
+    enabled: true
+    services:
+      - name: "nginx"
+        port: 80
+        check_url: "http://localhost/"
+      - name: "ssh"
+        port: 22
+      - name: "postgresql"
+        port: 5432
+  
+  # Check for failed services
+  failed_services_check:
+    enabled: true
+  
+  # Check package status
+  package_check:
+    enabled: true
+    ensure_no_held_packages: true
+  
+  # Run security scan after updates
+  security_scan:
+    enabled: true
+    scan_type: "basic"  # Options: basic, full
+
+# Notification settings
+notification:
+  enabled: true
+  channels:
+    - type: "email"
+      recipients:
+        - "admin@example.com"
+    - type: "slack"
+      webhook: "https://hooks.slack.com/services/YOUR/SLACK/WEBHOOK"
+      channel: "#server-updates"
+  
+  # When to send notifications
+  notify_on:
+    start: true
+    complete: true
+    error: true
+  
+  # Attach logs to notifications
+  attach_logs: true
+  max_log_size_kb: 500
+
+# Rollback options
+rollback:
+  enabled: true
+  automatic: false  # Whether to automatically roll back on failure
+  timeout: 600  # 10 minutes
+  verification_steps:
+    - "service nginx status"
+    - "service ssh status" 
