@@ -10,6 +10,12 @@ This is a comprehensive list of all available demo scenarios for the IT Admin Ag
 | Database Server | Set up a PostgreSQL database server | [postgresql_setup.yaml](server_config/postgresql_setup.yaml) | Coming soon |
 | Load Balancer Configuration | Configure HAProxy as a load balancer | [haproxy_setup.yaml](server_config/haproxy_setup.yaml) | Coming soon |
 
+## Server Provisioning Demos
+
+| Demo | Description | Configuration | Guide |
+|------|-------------|---------------|-------|
+| Ubuntu OS on PowerEdge | Install Ubuntu OS on Dell PowerEdge server via iDRAC Redfish | [ubuntu_poweredge_install.yaml](server_provisioning/ubuntu_poweredge_install.yaml) | [Guide](server_provisioning/ubuntu_poweredge_install_guide.md) |
+
 ## Diagnostics Demos
 
 | Demo | Description | Configuration | Guide |
@@ -35,6 +41,9 @@ Each demo configuration file (YAML) can be used with the IT Admin Agent in one o
 ```bash
 # Run a server configuration demo
 ./cli.py create server_configure "Set up Nginx web server" --parameters-file demos/server_config/nginx_setup.yaml
+
+# Run a server provisioning demo
+./cli.py create server_provision "Install Ubuntu on PowerEdge Server" --parameters-file demos/server_provisioning/ubuntu_poweredge_install.yaml
 
 # Run a diagnostics demo
 ./cli.py create system_diagnose "Diagnose network connectivity issues" --parameters-file demos/diagnostics/network_diagnosis.yaml
