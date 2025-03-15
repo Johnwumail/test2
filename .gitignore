@@ -64,3 +64,6 @@ doc/_build/
 # Specific to IT Admin Agent
 knowledge_base/data/
 knowledge_base/vectors/ 
+
+code_execution_workspace/
+.venv/
