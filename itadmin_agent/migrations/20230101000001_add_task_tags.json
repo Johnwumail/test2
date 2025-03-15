@@ -1,6 +1,0 @@
-{
-  "version": "20230101000001",
-  "description": "Add task tags",
-  "up_sql": "ALTER TABLE tasks ADD COLUMN tags TEXT;",
-  "down_sql": "ALTER TABLE tasks DROP COLUMN tags;"
-} 
